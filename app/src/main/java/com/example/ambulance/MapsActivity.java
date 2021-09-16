@@ -3,13 +3,15 @@ package com.example.ambulance;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
-import android.os.Handler;
+import android.view.View;
 import android.widget.Toast;
 
+import com.example.ambulance.databinding.ActivityMapsBinding;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -20,15 +22,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     FirebaseFirestore db;
-    private Handler mHandler = new Handler();
-    private Runnable runnable;
+    String uLat,uLng;
+    ActivityMapsBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        binding = ActivityMapsBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        uLat = getIntent().getStringExtra("lat");
+        uLng = getIntent().getStringExtra("lng");
 
     }
 
@@ -36,38 +43,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        LatLng user = new LatLng(23,90);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(user));;
+        LatLng latLng = new LatLng(Double.parseDouble(uLat),Double.parseDouble(uLng));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
-        runnable = new Runnable() {
-            @Override
-            public void run() {
+        showAmbulance();
 
-                db = FirebaseFirestore.getInstance();
-                mMap.clear();
-                db.collection("driver_location")
-                        .get()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
+        mMap.setOnInfoWindowClickListener(marker -> {
 
-                                    String lat = document.getData().get("latitude").toString();
-                                    String lng = document.getData().get("longitude").toString();
+            binding.card.setVisibility(View.VISIBLE);
 
-                                    LatLng sydney = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
-                                    mMap.addMarker(new MarkerOptions().position(sydney).title("document.getId()"));
-
-                                }
-                            } else {
-                                Toast.makeText(MapsActivity.this, "Error getting documents: "+ task.getException(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                mHandler.postDelayed(this, 3000);
-            }
-        };
-
-        runnable.run();
+        });
 
     }
+
+    public void Refresh(View view) {
+
+        showAmbulance();
+
+    }
+
+    public void Gone(View view) {
+
+        binding.card.setVisibility(View.GONE);
+
+    }
+
+    void showAmbulance(){
+
+        mMap.clear();
+        db = FirebaseFirestore.getInstance();
+
+        db.collection("driver").get().addOnCompleteListener(task -> {
+
+            if (task.isSuccessful()) {
+
+                for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+
+                    String lat = documentSnapshot.getData().get("latitude").toString();
+                    String lng = documentSnapshot.getData().get("longitude").toString();
+                    String title = documentSnapshot.getData().get("uName").toString();
+
+                    LatLng sydney = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+                    mMap.addMarker(new MarkerOptions().position(sydney).title(title).icon(BitmapDescriptorFactory.fromResource(R.drawable.ambulance)));
+
+                }
+
+            } else {
+
+                Toast.makeText(MapsActivity.this, "Error getting documents: "+ task.getException(), Toast.LENGTH_SHORT).show();
+
+            }
+
+        });
+
+    }
+
 }

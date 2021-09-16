@@ -27,7 +27,13 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) {
+        if (user != null) {
+
+            Intent intent = new Intent(MainActivity.this,Home.class);
+            startActivity(intent);
+            finish();
+
+        } else {
 
             binding.button2.setOnClickListener(v -> {
 
@@ -42,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
                                     Intent intent=new Intent(MainActivity.this, Home.class);
                                     startActivity(intent);
+                                    finish();
 
                                 } else {
 
@@ -61,11 +68,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
 
             });
-
-        } else {
-
-            Intent intent = new Intent(MainActivity.this,Home.class);
-            startActivity(intent);
 
         }
 
