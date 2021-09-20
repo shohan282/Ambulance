@@ -3,7 +3,8 @@
     package="com.example.ambulance">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -12,11 +13,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Ambulance">
+        <activity android:name=".SelectAmb"></activity>
+        <activity android:name=".SelectType" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/map_key" />
 
+        <activity
+            android:name=".TrackAmb"
+            android:label="@string/title_activity_track_amb" />
         <activity android:name=".MapsActivity" />
         <activity android:name=".Home" />
         <activity android:name=".SignUp" />

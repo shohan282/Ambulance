@@ -6,88 +6,92 @@
     android:layout_height="match_parent"
     tools:context=".MapsActivity">
 
-    <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
+    <fragment
         android:id="@+id/map"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
         android:name="com.google.android.gms.maps.SupportMapFragment"
+        map:cameraZoom="10"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        map:cameraZoom="9" />
+        android:layout_height="match_parent" />
 
     <ImageButton
         android:id="@+id/refresh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:layout_gravity="end"
         android:onClick="Refresh"
+        android:layout_marginTop="55dp"
+        android:layout_marginRight="10dp"
+        android:backgroundTint="#CCFFFFFF"
         android:src="@drawable/refresh" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="150dp"
         android:visibility="gone"
-        app:cardCornerRadius="3dp">
+        app:cardCornerRadius="5dp">
+
+        <ImageButton
+            android:id="@+id/cross"
+            android:layout_width="50dp"
+            android:layout_height="45dp"
+            android:layout_gravity="end"
+            android:onClick="Gone"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/close" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:padding="5dp"
             android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/uName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="15"
-                    android:text="TextView" />
-
-                <ImageButton
-                    android:id="@+id/cross"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="#FF6F9E"
-                    android:onClick="Gone"
-                    android:src="@drawable/close" />
-
-            </LinearLayout>
+                android:text="TextView"
+                android:textColor="#000000"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/phnNumShow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="TextView"
+                android:onClick="clickNum"
+                android:textColor="#000000"
+                android:textSize="24sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingHorizontal="5dp">
+                android:padding="5dp"
+                android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/button"
+                    android:id="@+id/call"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginRight="10dp"
-                    android:layout_weight="1"
                     android:backgroundTint="@color/green"
                     android:drawableLeft="@drawable/call"
+                    android:onClick="call"
                     android:text="Call"
                     android:textColor="#FFFFFF" />
 
                 <Button
-                    android:id="@+id/button5"
+                    android:id="@+id/track"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_height="match_parent"
                     android:backgroundTint="@color/blue"
                     android:drawableLeft="@drawable/direction"
                     android:text="track"
+                    android:onClick="Track"
                     android:textColor="#FFFFFF" />
             </LinearLayout>
 

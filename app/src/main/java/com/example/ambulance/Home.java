@@ -7,6 +7,9 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,7 +17,9 @@ import com.example.ambulance.databinding.ActivityHomeBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
-
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 
 public class Home extends AppCompatActivity {
@@ -23,6 +28,7 @@ public class Home extends AppCompatActivity {
     FirebaseAuth mAuth;
     Double latitude,longitude;
     FusedLocationProviderClient fusedLocationClient;
+    FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +68,144 @@ public class Home extends AppCompatActivity {
 
         });
 
-        binding.logout.setOnClickListener(v -> {
+        binding.find.setOnClickListener(v -> {
 
-            mAuth.signOut();
-            Intent intent = new Intent(Home.this, MainActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(this,SelectType.class));
+
+        });
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.logout:
+
+                mAuth.signOut();
+
+                Intent intent=new Intent(Home.this,MainActivity.class);
+                startActivity(intent);
+                finish();
+
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void callNow(View view) {
+
+        binding.wait.setVisibility(View.VISIBLE);
+        db = FirebaseFirestore.getInstance();
+
+        db.collection("driver").whereGreaterThan("latitude",latitude).limit(1).get().addOnCompleteListener(task -> {
+
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+
+                    String north = document.getData().get("latitude").toString();
+
+
+                    db.collection("driver").whereLessThan("latitude",latitude).orderBy("latitude", Query.Direction.DESCENDING).limit(1).get().addOnCompleteListener(task2 -> {
+
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document2 : task.getResult()) {
+
+                                String south = document2.getData().get("latitude").toString();
+
+                                db.collection("driver").whereLessThan("longitude",longitude).orderBy("longitude", Query.Direction.DESCENDING).limit(1).get().addOnCompleteListener(task3 -> {
+
+                                    if (task.isSuccessful()) {
+                                        for (QueryDocumentSnapshot document3 : task.getResult()) {
+
+                                            String west = document3.getData().get("longitude").toString();
+
+                                            db.collection("driver").whereGreaterThan("longitude",longitude).limit(1).get().addOnCompleteListener(task4 -> {
+
+                                                if (task.isSuccessful()) {
+                                                    for (QueryDocumentSnapshot document4 : task.getResult()) {
+
+                                                        String east = document4.getData().get("longitude").toString();
+
+                                                        double dEast,dWest,dNorth,dSouth;
+
+                                                        dEast = Double.parseDouble(east);
+                                                        dNorth = Double.parseDouble(north);
+                                                        dWest = Double.parseDouble(west);
+                                                        dSouth = Double.parseDouble(south);
+
+                                                        if(dEast+dWest < dNorth+dSouth) {
+
+                                                            if(dEast<dWest) {
+
+                                                                Toast.makeText(this, "east is small", Toast.LENGTH_SHORT).show();
+
+                                                            } else {
+
+                                                                Toast.makeText(this, "west is small", Toast.LENGTH_SHORT).show();
+
+                                                            }
+
+
+                                                        } else {
+
+                                                            if (dNorth<dSouth) {
+
+                                                                Toast.makeText(this, "north is small", Toast.LENGTH_SHORT).show();
+
+                                                            } else {
+
+                                                                Toast.makeText(this, "south is small", Toast.LENGTH_SHORT).show();
+
+                                                            }
+
+                                                            binding.wait.setVisibility(View.INVISIBLE);
+
+                                                        }
+
+                                                    }
+                                                } else {
+
+                                                    Toast.makeText(Home.this, "error: "+task4.getException(), Toast.LENGTH_SHORT).show();
+
+                                                }
+
+                                            });
+
+                                        }
+                                    } else {
+
+                                        Toast.makeText(Home.this, "error: "+task3.getException(), Toast.LENGTH_SHORT).show();
+
+                                    }
+
+                                });
+
+                            }
+                        } else {
+
+                            Toast.makeText(Home.this, "error: "+task2.getException(), Toast.LENGTH_SHORT).show();
+
+                        }
+
+                    });
+
+                }
+            } else {
+
+                Toast.makeText(Home.this, "error: "+task.getException(), Toast.LENGTH_SHORT).show();
+
+            }
 
         });
 

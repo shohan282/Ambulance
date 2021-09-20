@@ -1,7 +1,12 @@
 package com.example.ambulance;
 
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -22,7 +27,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     FirebaseFirestore db;
-    String uLat,uLng;
+    String uLat,uLng,mbl;
     ActivityMapsBinding binding;
 
     @Override
@@ -43,6 +48,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) { return; }
+
+        mMap.setMyLocationEnabled(true);
         LatLng latLng = new LatLng(Double.parseDouble(uLat),Double.parseDouble(uLng));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
@@ -51,6 +59,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnInfoWindowClickListener(marker -> {
 
             binding.card.setVisibility(View.VISIBLE);
+            showInfo(marker.getTitle());
+
+        });
+
+    }
+
+    private void showInfo(String title) {
+
+        db = FirebaseFirestore.getInstance();
+        mMap.clear();
+
+        db.collection("driver").whereEqualTo("uName",title).get().addOnCompleteListener(task -> {
+
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+
+                    mbl = document.getData().get("phn").toString();
+
+                    binding.phnNumShow.setText("Mbl: "+mbl);
+                    binding.uName.setText(title);
+
+                }
+            } else {
+                Toast.makeText(MapsActivity.this, "error: "+task.getException(), Toast.LENGTH_SHORT).show();
+            }
+
 
         });
 
@@ -95,6 +129,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
         });
+
+    }
+
+    public void call(View view) {
+
+        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mbl));
+        startActivity(intent);
+
+    }
+
+    public void clickNum(View view) {
+
+        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mbl));
+        startActivity(intent);
+
+    }
+
+    public void Track(View view) {
+
+        Intent intent = new Intent(MapsActivity.this,TrackAmb.class);
+        intent.putExtra("lat",uLat);
+        intent.putExtra("lng",uLng);
+        intent.putExtra("mbl",mbl);
+        startActivity(intent);
 
     }
 

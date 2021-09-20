@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFAFA"
     android:orientation="vertical"
     android:padding="16dp"
     tools:context=".Home">
@@ -10,20 +12,83 @@
     <Button
         android:id="@+id/map"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
+        android:layout_marginBottom="10dp"
         android:text="Show Ambulance" />
+
+    <Button
+        android:id="@+id/find"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginBottom="10dp"
+        android:text="Find Ambulance" />
+
+    <Button
+        android:id="@+id/button6"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginBottom="10dp"
+        android:text="Search Ambulance" />
+
+    <Button
+        android:id="@+id/button7"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:text="Recent Call" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="bottom"
+        android:gravity="center"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/logout"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/call_now"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:layout_margin="15dp"
+            android:onClick="callNow"
+            android:text="Call
+                Now"
+            android:textSize="24sp"
+            app:cornerRadius="80dp"
+            app:icon="@drawable/call_now"
+            app:iconGravity="start"
+            app:iconPadding="0dp"
+            app:iconSize="50dp" />
+
+        <LinearLayout
+            android:id="@+id/wait"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="log out" />
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:visibility="invisible"
+            android:orientation="horizontal">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:indeterminate="true"
+                android:indeterminateDrawable="@drawable/progress_bg"
+                android:progress="0" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="wait  a sec..."
+                android:layout_marginLeft="5dp"
+                android:textColor="#F44336"
+                android:textSize="30sp" />
+        </LinearLayout>
+
     </LinearLayout>
+
 
 </LinearLayout>

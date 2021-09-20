@@ -17,56 +17,56 @@ import java.util.Map;
 
 public class SignUp extends AppCompatActivity {
 
-    FirebaseAuth mAuth;
-    ActivitySignUpBinding binding;
-    String email,password,name,uid;
-    FirebaseFirestore db;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivitySignUpBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
+	FirebaseAuth mAuth;
+	ActivitySignUpBinding binding;
+	String email,password,name,uid;
+	FirebaseFirestore db;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		binding = ActivitySignUpBinding.inflate(getLayoutInflater());
+		View view = binding.getRoot();
+		setContentView(view);
 
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+		mAuth = FirebaseAuth.getInstance();
+		db = FirebaseFirestore.getInstance();
 
-        binding.button4.setOnClickListener(v -> {
+		binding.button4.setOnClickListener(v -> {
 
-            email = binding.editTextTextEmailAddress.getText().toString();
-            password = binding.editTextTextPassword.getText().toString();
-            name = binding.editTextTextPersonName.getText().toString();
+			email = binding.editTextTextEmailAddress.getText().toString();
+			password = binding.editTextTextPassword.getText().toString();
+			name = binding.editTextTextPersonName.getText().toString();
 
-            if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
+			if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
 
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(task -> {
+				mAuth.createUserWithEmailAndPassword(email, password)
+						.addOnCompleteListener(task -> {
 
-                            if (task.isSuccessful()) {
+							if (task.isSuccessful()) {
 
-                                uid=mAuth.getCurrentUser().getUid();
+								uid=mAuth.getCurrentUser().getUid();
 
-                                Map<String, String> user = new HashMap<>();
-                                user.put("uName", name);
-                                user.put("uid", uid);
+								Map<String, String> user = new HashMap<>();
+								user.put("uName", name);
+								user.put("uid", uid);
 
-                                db.collection("users").document(uid).set(user).addOnSuccessListener(aVoid -> { })
-                                        .addOnFailureListener(e ->
-                                                Toast.makeText(SignUp.this, "name error", Toast.LENGTH_SHORT).show());
+								db.collection("users").document(uid).set(user).addOnSuccessListener(aVoid -> { })
+										.addOnFailureListener(e ->
+												Toast.makeText(SignUp.this, "name error", Toast.LENGTH_SHORT).show());
 
-                                Intent intent=new Intent(SignUp.this,MainActivity.class);
-                                startActivity(intent);
+								Intent intent=new Intent(SignUp.this,MainActivity.class);
+								startActivity(intent);
 
-                            } else {
+							} else {
 
-                                Toast.makeText(SignUp.this, "failed: "+task.getException(), Toast.LENGTH_SHORT).show();
+								Toast.makeText(SignUp.this, "failed: "+task.getException(), Toast.LENGTH_SHORT).show();
 
-                            }
+							}
 
-                        });
+						});
 
-            }
-        });
+			}
+		});
 
-    }
+	}
 }
