@@ -41,31 +41,31 @@ public class SelectType extends AppCompatActivity implements View.OnClickListene
 
             case R.id.freezer:
                 Intent intent2 =new Intent(this,SelectAmb.class);
-                intent2.putExtra("type","freezer");
+                intent2.putExtra("type","Freezer Ambulance");
                 startActivity(intent2);
                 break;
 
             case R.id.icu:
                 Intent intent3 =new Intent(this,SelectAmb.class);
-                intent3.putExtra("type","icu");
+                intent3.putExtra("type","Mobile ICU");
                 startActivity(intent3);
                 break;
 
             case R.id.multiple:
                 Intent intent4 =new Intent(this,SelectAmb.class);
-                intent4.putExtra("type","multiple");
+                intent4.putExtra("type","Multiple Patient");
                 startActivity(intent4);
                 break;
 
             case R.id.other:
                 Intent intent5 =new Intent(this,SelectAmb.class);
-                intent5.putExtra("type","other");
+                intent5.putExtra("type","Other");
                 startActivity(intent5);
                 break;
 
             case R.id.nurse:
                 Intent intent6 =new Intent(this,SelectAmb.class);
-                intent6.putExtra("type","nurse");
+                intent6.putExtra("type","Medical &amp; Nursing care");
                 startActivity(intent6);
                 break;
 

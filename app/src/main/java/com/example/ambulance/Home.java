@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +21,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Home extends AppCompatActivity {
@@ -29,6 +34,7 @@ public class Home extends AppCompatActivity {
     Double latitude,longitude;
     FusedLocationProviderClient fusedLocationClient;
     FirebaseFirestore db;
+    String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,26 +44,11 @@ public class Home extends AppCompatActivity {
         setContentView(view);
 
         mAuth = FirebaseAuth.getInstance();
-
+        uid = mAuth.getCurrentUser().getUid();
+        db = FirebaseFirestore.getInstance();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) { return; }
-
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, location -> {
-
-                    if (location != null) {
-
-                        longitude = location.getLongitude();
-                        latitude = location.getLatitude();
-
-                    } else {
-
-                        latitude = 23.723519;
-                        longitude = 90.360677;
-
-                    }
-                });
+        getLocation();
 
         binding.map.setOnClickListener(v -> {
 
@@ -73,6 +64,34 @@ public class Home extends AppCompatActivity {
             startActivity(new Intent(this,SelectType.class));
 
         });
+
+    }
+
+    private void getLocation() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) { return; }
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, location -> {
+
+                    if (location != null) {
+
+                        longitude = location.getLongitude();
+                        latitude = location.getLatitude();
+
+                        Map<String, Object> user = new HashMap<>();
+                        user.put("latitude",latitude);
+                        user.put("longitude",longitude);
+
+                        db.collection("users").document(uid).set(user, SetOptions.merge()).addOnSuccessListener(aVoid -> { });
+
+                    } else {
+
+                        latitude = 23.723519;
+                        longitude = 90.360677;
+
+                    }
+                });
 
     }
 
@@ -106,7 +125,6 @@ public class Home extends AppCompatActivity {
     public void callNow(View view) {
 
         binding.wait.setVisibility(View.VISIBLE);
-        db = FirebaseFirestore.getInstance();
 
         db.collection("driver").whereGreaterThan("latitude",latitude).limit(1).get().addOnCompleteListener(task -> {
 
@@ -148,11 +166,11 @@ public class Home extends AppCompatActivity {
 
                                                             if(dEast<dWest) {
 
-                                                                Toast.makeText(this, "east is small", Toast.LENGTH_SHORT).show();
+                                                                FireUpLng(dEast);
 
                                                             } else {
 
-                                                                Toast.makeText(this, "west is small", Toast.LENGTH_SHORT).show();
+                                                                FireUpLng(dWest);
 
                                                             }
 
@@ -161,15 +179,13 @@ public class Home extends AppCompatActivity {
 
                                                             if (dNorth<dSouth) {
 
-                                                                Toast.makeText(this, "north is small", Toast.LENGTH_SHORT).show();
+                                                                FireUpLat(dNorth);
 
                                                             } else {
 
-                                                                Toast.makeText(this, "south is small", Toast.LENGTH_SHORT).show();
+                                                                FireUpLat(dSouth);
 
                                                             }
-
-                                                            binding.wait.setVisibility(View.INVISIBLE);
 
                                                         }
 
@@ -209,6 +225,52 @@ public class Home extends AppCompatActivity {
 
         });
 
+    }
+
+    private void FireUpLat(double latitude) {
+
+        db.collection("driver").whereEqualTo("latitude",latitude).get().addOnCompleteListener(task -> {
+
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+
+                   String mbl = document.getData().get("phn").toString();
+
+                   Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mbl));
+                   startActivity(intent);
+                   binding.wait.setVisibility(View.INVISIBLE);
+
+                }
+            } else {
+                Toast.makeText(Home.this, "error: "+task.getException(), Toast.LENGTH_SHORT).show();
+            }
+
+
+        });
+        
+    }
+
+    private void FireUpLng(double longitude) {
+
+        db.collection("driver").whereEqualTo("longitude",longitude).get().addOnCompleteListener(task -> {
+
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+
+                    String mbl = document.getData().get("phn").toString();
+
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mbl));
+                    startActivity(intent);
+                    binding.wait.setVisibility(View.INVISIBLE);
+
+                }
+            } else {
+                Toast.makeText(Home.this, "error: "+task.getException(), Toast.LENGTH_SHORT).show();
+            }
+
+
+        });
+        
     }
 
 }

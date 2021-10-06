@@ -19,7 +19,7 @@ public class SignUp extends AppCompatActivity {
 
 	FirebaseAuth mAuth;
 	ActivitySignUpBinding binding;
-	String email,password,name,uid;
+	String email,password,name,uid,phone;
 	FirebaseFirestore db;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +36,8 @@ public class SignUp extends AppCompatActivity {
 			email = binding.editTextTextEmailAddress.getText().toString();
 			password = binding.editTextTextPassword.getText().toString();
 			name = binding.editTextTextPersonName.getText().toString();
+			phone = binding.editTextPhone.getText().toString();
+			String substr = phone.substring(phone.length() - 9);
 
 			if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
 
@@ -49,6 +51,7 @@ public class SignUp extends AppCompatActivity {
 								Map<String, String> user = new HashMap<>();
 								user.put("uName", name);
 								user.put("uid", uid);
+								user.put("phone", substr);
 
 								db.collection("users").document(uid).set(user).addOnSuccessListener(aVoid -> { })
 										.addOnFailureListener(e ->
@@ -56,6 +59,7 @@ public class SignUp extends AppCompatActivity {
 
 								Intent intent=new Intent(SignUp.this,MainActivity.class);
 								startActivity(intent);
+								finish();
 
 							} else {
 
